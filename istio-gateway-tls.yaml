@@ -1,0 +1,59 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: ingressgateway-eventproc-nifi
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "nifi-eventproc.abcd.com"
+    tls:
+      httpsRedirect: true
+  - port:
+      number: 443
+      name: https-443
+      protocol: HTTPS
+    hosts:
+    - "nifi-eventproc.abcd.com"
+    tls:
+      mode: PASSTHROUGH
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: eventproc-nifi-vs
+spec:
+  hosts:
+  - nifi-eventproc.abcd.com
+  gateways:
+  - ingressgateway-eventproc-nifi
+  tls:
+  - match:
+    - port: 443
+      sniHosts:
+      - nifi-eventproc.abcd.com
+    route:
+    - destination:
+        host: nifi-eventproc
+        port:
+          number: 9443
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: nifi-eventproc-dr
+spec:
+  host: nifi-eventproc
+  trafficPolicy:
+    loadBalancer:
+      consistentHash:
+        useSourceIp: true
+  subsets:
+    - labels:
+        app: nifi
+      name: all-nifi-pods

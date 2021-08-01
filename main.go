@@ -15,6 +15,7 @@ type Message struct {
 	SourceIpAddress string
 	IpAddress       string
 	Time            time.Time
+	Endpoint        string
 }
 
 func getSourceIpAddress(r *http.Request) string {
@@ -65,12 +66,29 @@ func getHostname(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println("Handling!!!")
-	m := Message{hostname, getSourceIpAddress(r), addr, time.Now()}
+	m := Message{hostname, getSourceIpAddress(r), addr, time.Now(), "/"}
+	json.NewEncoder(w).Encode(m)
+}
+
+func getHostnameOidc(w http.ResponseWriter, r *http.Request) {
+	hostname, err := os.Hostname()
+	if err != nil {
+		panic(err)
+	}
+
+	addr, err := getInterfaceIpv4Addr("eth0")
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Handling!!!")
+	m := Message{hostname, getSourceIpAddress(r), addr, time.Now(), "/oidc"}
 	json.NewEncoder(w).Encode(m)
 }
 
 func handleRequests() {
 	http.HandleFunc("/", getHostname)
+	http.HandleFunc("/oidc", getHostnameOidc)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 

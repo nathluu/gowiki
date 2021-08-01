@@ -42,7 +42,7 @@ spec:
       consistentHash:
         # httpHeaderName: X-Forwarded-For
         useSourceIp: true
-  subsets:
-    - labels:
-        app: gowiki
-      name: all-gowiki-pods
+  # subsets:
+  #   - labels:
+  #       app: gowiki
+  #     name: all-gowiki-pods

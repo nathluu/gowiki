@@ -21,6 +21,10 @@ metadata:
     app: gowiki
 spec:
   type: ClusterIP
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
   ports:
   - port: 8080
     name: http

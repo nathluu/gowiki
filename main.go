@@ -86,9 +86,37 @@ func getHostnameOidc(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(m)
 }
 
+func getreadyz(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Readyz Handling!!!")
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	resp := make(map[string]string)
+	resp["message"] = "Status OK"
+	jsonResp, err := json.Marshal(resp)
+	if err != nil {
+		log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+	}
+	w.Write(jsonResp)
+}
+
+func getlivez(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Livez Handling!!!")
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	resp := make(map[string]string)
+	resp["message"] = "Status OK"
+	jsonResp, err := json.Marshal(resp)
+	if err != nil {
+		log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+	}
+	w.Write(jsonResp)
+}
+
 func handleRequests() {
 	http.HandleFunc("/", getHostname)
 	http.HandleFunc("/oidc", getHostnameOidc)
+	http.HandleFunc("/readyz", getreadyz)
+	http.HandleFunc("/livez", getlivez)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
